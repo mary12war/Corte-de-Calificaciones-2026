@@ -1,0 +1,25 @@
+{
+  "name": "consulta-estudiantes",
+  "version": "1.0.0",
+  "description": "Aplicación web para buscar y visualizar datos de estudiantes desde Excel",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "generate-sample": "node scripts/generate-sample-xlsx.js"
+  },
+  "keywords": ["estudiantes", "excel", "xlsx", "express"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
