@@ -1,7 +1,7 @@
 {
-  "name": "consulta-estudiantes",
+  "name": "corte-de-calificaciones-2026",
   "version": "1.0.0",
-  "description": "Aplicación web para buscar y visualizar datos de estudiantes desde Excel",
+  "description": "Consulta web de calificaciones y datos de estudiantes desde Excel",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
