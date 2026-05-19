@@ -142,17 +142,25 @@ Máximo **5 MB**. Solo `.xlsx`.
 
 ## GitHub Pages
 
-1. En el repositorio: **Settings → Pages → Build and deployment → Source**: `Deploy from a branch`.
-2. **Branch**: `main`, carpeta **`/ (root)`**.
-3. Guarde. La URL será `https://TU_USUARIO.github.io/Corte-de-Calificaciones-2026/`.
+GitHub Pages **no ejecuta Node.js**, por eso la búsqueda usa `js/estudiantes.json` generado desde su Excel.
 
-GitHub Pages solo publica el frontend (`index.html`, `css/`, `js/`). La API Node debe desplegarse aparte (Render, Railway, etc.). En `index.html`, descomente y configure:
+1. Actualice el Excel en `data/CORTEPRIMERSEMESTRE2026.xlsx`.
+2. Genere el JSON y súbalo a GitHub:
 
-```html
-<script>window.API_BASE_URL = 'https://tu-servidor.onrender.com';</script>
+```bash
+npm run build-data
+git add js/estudiantes.json
+git commit -m "Actualizar datos para GitHub Pages"
+git push
 ```
 
-En local con `npm start`, no hace falta esa línea: la API y la web usan el mismo origen.
+3. En el repositorio: **Settings → Pages → Source**: rama `main`, carpeta **`/ (root)`**.
+
+La URL será: `https://TU_USUARIO.github.io/Corte-de-Calificaciones-2026/`
+
+> **Nota:** `js/estudiantes.json` es público en el sitio (como cualquier archivo estático). No suba datos sensibles si el repositorio es público.
+
+En **local** (`npm start`) se usa la API con el Excel en memoria; no hace falta regenerar el JSON salvo para publicar en Pages.
 
 ## Seguridad y GitHub
 

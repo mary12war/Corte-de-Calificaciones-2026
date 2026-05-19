@@ -1,11 +1,16 @@
 /**
- * Cliente: búsqueda de estudiantes por ID vía API REST.
+ * Cliente: búsqueda de estudiantes por ID.
+ * - Local (npm start): API en el mismo servidor.
+ * - GitHub Pages: datos en js/estudiantes.json (generar con npm run build-data).
  */
 
-/** Vacío = mismo origen (npm start). En GitHub Pages definir window.API_BASE_URL en index.html */
+/** URL del API si el backend está en otro host (opcional) */
 const API_BASE = (window.API_BASE_URL || '').replace(/\/$/, '');
 
 const VACIO = '—';
+
+/** Índice en memoria para modo estático (GitHub Pages) */
+let indiceLocal = null;
 
 const elementos = {
   form: document.getElementById('form-busqueda'),
@@ -31,6 +36,51 @@ const elementos = {
 };
 
 /**
+ * Ruta base para assets (compatible con GitHub Pages /nombre-repo/)
+ * @returns {string}
+ */
+function obtenerRutaBase() {
+  const path = window.location.pathname;
+  if (path.endsWith('/')) return path;
+  if (path.endsWith('.html')) {
+    return path.slice(0, path.lastIndexOf('/') + 1);
+  }
+  const ultimaBarra = path.lastIndexOf('/');
+  if (ultimaBarra > 0) return `${path.slice(0, ultimaBarra + 1)}`;
+  return '/';
+}
+
+/**
+ * @returns {boolean}
+ */
+function esEntornoLocal() {
+  return (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1'
+  );
+}
+
+/**
+ * Usar API Node solo en local o si se definió API_BASE_URL explícitamente.
+ * @returns {boolean}
+ */
+function debeUsarApi() {
+  return Boolean(API_BASE) || esEntornoLocal();
+}
+
+/**
+ * Normaliza ID igual que el servidor.
+ * @param {string} id
+ * @returns {string}
+ */
+function normalizarId(id) {
+  return String(id)
+    .trim()
+    .toLowerCase()
+    .replace(/[\s\-_.]/g, '');
+}
+
+/**
  * Muestra un valor o guión si está vacío.
  * @param {string|number|null|undefined} valor
  * @returns {string}
@@ -41,19 +91,10 @@ function mostrarValor(valor) {
   return texto === '' ? VACIO : texto;
 }
 
-/**
- * @param {string|number|null|undefined} valor
- * @returns {boolean}
- */
 function estaVacio(valor) {
   return mostrarValor(valor) === VACIO;
 }
 
-/**
- * Convierte texto numérico (admite $, comas) a número o null.
- * @param {string|number|null|undefined} valor
- * @returns {number|null}
- */
 function parseNumero(valor) {
   if (estaVacio(valor)) return null;
   const limpio = String(valor).trim().replace(/[$,\s]/g, '');
@@ -61,11 +102,6 @@ function parseNumero(valor) {
   return Number.isFinite(n) ? n : null;
 }
 
-/**
- * Calificación con un decimal: 5 → "5.0", 92 → "92.0"
- * @param {string|number|null|undefined} valor
- * @returns {string}
- */
 function formatNotaDecimal(valor) {
   if (estaVacio(valor)) return VACIO;
   const n = parseNumero(valor);
@@ -73,11 +109,6 @@ function formatNotaDecimal(valor) {
   return n.toFixed(1);
 }
 
-/**
- * Monto en formato moneda: 20 → "$20.00"
- * @param {string|number|null|undefined} valor
- * @returns {string}
- */
 function formatMoneda(valor) {
   if (estaVacio(valor)) return VACIO;
   const n = parseNumero(valor);
@@ -90,9 +121,6 @@ function formatMoneda(valor) {
   }).format(n);
 }
 
-/**
- * Oculta todos los paneles de resultado.
- */
 function limpiarResultados() {
   elementos.alertaError.classList.add('d-none');
   elementos.alertaError.textContent = '';
@@ -100,10 +128,6 @@ function limpiarResultados() {
   elementos.tarjeta.classList.add('d-none');
 }
 
-/**
- * Valida el ID ingresado (trim, no vacío).
- * @returns {string|null} ID listo para la URL o null si inválido
- */
 function validarId() {
   const id = elementos.inputId.value.trim();
   if (!id) {
@@ -111,23 +135,15 @@ function validarId() {
     return null;
   }
   elementos.inputId.classList.remove('is-invalid');
-  return encodeURIComponent(id);
+  return id;
 }
 
-/**
- * Activa o desactiva estado de carga del botón.
- * @param {boolean} cargando
- */
 function setCargando(cargando) {
   elementos.btnBuscar.disabled = cargando;
   elementos.btnBuscar.classList.toggle('loading', cargando);
   elementos.spinner.classList.toggle('d-none', !cargando);
 }
 
-/**
- * Rellena la tarjeta con los datos del estudiante.
- * @param {Object} est
- */
 function mostrarEstudiante(est) {
   const nombreCompleto = [est.Nombre, est.Apellido]
     .map((v) => (v || '').trim())
@@ -151,21 +167,71 @@ function mostrarEstudiante(est) {
 }
 
 /**
- * Consulta la API por ID.
- * @param {string} idEncoded
+ * Carga js/estudiantes.json (modo GitHub Pages).
  */
-async function buscarEstudiante(idEncoded) {
+async function cargarIndiceLocal() {
+  if (indiceLocal) return indiceLocal;
+
+  const url = `${obtenerRutaBase()}js/estudiantes.json`;
+  const respuesta = await fetch(url);
+
+  if (!respuesta.ok) {
+    throw new Error(
+      'No se encontraron datos en el sitio. En su PC ejecute: npm run build-data y suba js/estudiantes.json a GitHub.'
+    );
+  }
+
+  indiceLocal = await respuesta.json();
+  return indiceLocal;
+}
+
+/**
+ * Búsqueda vía API Node.
+ * @param {string} id
+ */
+async function buscarPorApi(id) {
+  const idEncoded = encodeURIComponent(id);
+  const respuesta = await fetch(`${API_BASE}/api/estudiante/${idEncoded}`);
+
+  const tipo = respuesta.headers.get('content-type') || '';
+  if (!tipo.includes('application/json')) {
+    throw new Error(
+      'El servidor no respondió con datos. Si usa GitHub Pages, no hace falta API: suba js/estudiantes.json (npm run build-data).'
+    );
+  }
+
+  if (!respuesta.ok) {
+    throw new Error('No se pudo completar la búsqueda. Intente de nuevo.');
+  }
+
+  return respuesta.json();
+}
+
+/**
+ * Búsqueda en JSON local (GitHub Pages).
+ * @param {string} id
+ */
+async function buscarPorJson(id) {
+  const indice = await cargarIndiceLocal();
+  const clave = normalizarId(id);
+  const estudiante = indice[clave] || null;
+  return {
+    encontrado: Boolean(estudiante),
+    estudiante,
+  };
+}
+
+/**
+ * @param {string} id
+ */
+async function buscarEstudiante(id) {
   limpiarResultados();
   setCargando(true);
 
   try {
-    const respuesta = await fetch(`${API_BASE}/api/estudiante/${idEncoded}`);
-
-    if (!respuesta.ok) {
-      throw new Error('No se pudo completar la búsqueda. Intente de nuevo.');
-    }
-
-    const datos = await respuesta.json();
+    const datos = debeUsarApi()
+      ? await buscarPorApi(id)
+      : await buscarPorJson(id);
 
     if (!datos.encontrado || !datos.estudiante) {
       elementos.noEncontrado.classList.remove('d-none');
@@ -184,9 +250,9 @@ async function buscarEstudiante(idEncoded) {
 
 elementos.form.addEventListener('submit', (evento) => {
   evento.preventDefault();
-  const idEncoded = validarId();
-  if (!idEncoded) return;
-  buscarEstudiante(idEncoded);
+  const id = validarId();
+  if (!id) return;
+  buscarEstudiante(id);
 });
 
 elementos.inputId.addEventListener('input', () => {
@@ -194,3 +260,10 @@ elementos.inputId.addEventListener('input', () => {
     elementos.inputId.classList.remove('is-invalid');
   }
 });
+
+// Precargar JSON en GitHub Pages para que la primera búsqueda sea más rápida
+if (!debeUsarApi()) {
+  cargarIndiceLocal().catch(() => {
+    /* El error se mostrará al buscar */
+  });
+}

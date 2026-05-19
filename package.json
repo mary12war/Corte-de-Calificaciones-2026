@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "nodemon server/index.js",
-    "generate-sample": "node scripts/generate-sample-xlsx.js"
+    "generate-sample": "node scripts/generate-sample-xlsx.js",
+    "build-data": "node scripts/export-estudiantes-json.js"
   },
   "keywords": ["estudiantes", "excel", "xlsx", "express"],
   "author": "",
