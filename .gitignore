@@ -26,5 +26,5 @@ uploads/
 tmp/
 
 # Datos sensibles (descomentar si NO desea subir datos reales a GitHub)
- /data/CORTEPRIMERSEMESTRE2026.xlsx
- /data/*.xlsx
+/data/CORTEPRIMERSEMESTRE2026.xlsx
+/data/*.xlsx

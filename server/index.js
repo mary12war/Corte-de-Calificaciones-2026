@@ -10,11 +10,20 @@ const estudianteRoutes = require('./routes/estudiante');
 
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, '..', 'data', 'CORTEPRIMERSEMESTRE2026.xlsx');
-const CLIENT_DIR = path.join(__dirname, '..', 'client');
+const ROOT_DIR = path.join(__dirname, '..');
 
 const app = express();
 
 app.use(express.json({ limit: '100kb' }));
+
+// CORS: necesario si el frontend está en GitHub Pages y la API en otro host
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 
 /** Almacén en memoria (misma referencia para rutas y arranque) */
 const estudiantesStore = {
@@ -42,13 +51,11 @@ function inicializarDatos() {
 // API
 app.use('/api/estudiante', estudianteRoutes);
 
-// Cliente estático (no servir /data)
-app.use(express.static(CLIENT_DIR, { index: 'index.html' }));
-
-// Fallback para rutas del cliente
-app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api')) return next();
-  res.sendFile(path.join(CLIENT_DIR, 'index.html'));
+// Frontend en la raíz (GitHub Pages + desarrollo local). No exponer /data ni /server.
+app.use('/css', express.static(path.join(ROOT_DIR, 'css')));
+app.use('/js', express.static(path.join(ROOT_DIR, 'js')));
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(ROOT_DIR, 'index.html'));
 });
 
 // Manejo de errores global

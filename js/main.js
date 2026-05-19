@@ -2,6 +2,9 @@
  * Cliente: búsqueda de estudiantes por ID vía API REST.
  */
 
+/** Vacío = mismo origen (npm start). En GitHub Pages definir window.API_BASE_URL en index.html */
+const API_BASE = (window.API_BASE_URL || '').replace(/\/$/, '');
+
 const VACIO = '—';
 
 const elementos = {
@@ -156,7 +159,7 @@ async function buscarEstudiante(idEncoded) {
   setCargando(true);
 
   try {
-    const respuesta = await fetch(`/api/estudiante/${idEncoded}`);
+    const respuesta = await fetch(`${API_BASE}/api/estudiante/${idEncoded}`);
 
     if (!respuesta.ok) {
       throw new Error('No se pudo completar la búsqueda. Intente de nuevo.');

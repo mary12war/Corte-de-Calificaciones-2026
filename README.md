@@ -21,16 +21,15 @@ Consulta web de estudiantes a partir de un archivo Excel (`.xlsx`). El servidor 
 
 ```text
 Corte-de-Calificaciones-2026/
+├── index.html          # Raíz: GitHub Pages sirve esta página
+├── css/styles.css
+├── js/main.js
 ├── README.md
 ├── package.json
 ├── server/
 │   ├── index.js
 │   ├── excelLoader.js
 │   └── routes/estudiante.js
-├── client/
-│   ├── index.html
-│   ├── css/styles.css
-│   └── js/main.js
 ├── data/
 │   └── CORTEPRIMERSEMESTRE2026.xlsx
 └── scripts/
@@ -140,6 +139,20 @@ curl -X POST -F "archivo=@data/mi_lista.xlsx" http://localhost:3000/api/estudian
 ```
 
 Máximo **5 MB**. Solo `.xlsx`.
+
+## GitHub Pages
+
+1. En el repositorio: **Settings → Pages → Build and deployment → Source**: `Deploy from a branch`.
+2. **Branch**: `main`, carpeta **`/ (root)`**.
+3. Guarde. La URL será `https://TU_USUARIO.github.io/Corte-de-Calificaciones-2026/`.
+
+GitHub Pages solo publica el frontend (`index.html`, `css/`, `js/`). La API Node debe desplegarse aparte (Render, Railway, etc.). En `index.html`, descomente y configure:
+
+```html
+<script>window.API_BASE_URL = 'https://tu-servidor.onrender.com';</script>
+```
+
+En local con `npm start`, no hace falta esa línea: la API y la web usan el mismo origen.
 
 ## Seguridad y GitHub
 
