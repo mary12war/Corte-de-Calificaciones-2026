@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Consulta de Estudiantes</title>
+  <title>Consulta de Reporte de Estudiantes 2026</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="css/styles.css">
@@ -11,8 +11,9 @@
 <body>
   <header class="app-header py-4 mb-4">
     <div class="container text-center">
-      <h1 class="h3 mb-1">Consulta de Estudiantes</h1>
-      <p class="text-muted mb-0 small">Busque por cédula o ID del estudiante</p>
+      <img src="data\LOGO-SUPERATE_2000px.png" alt="Logo" class="img-fluid"  width="150">
+      <h1 class="h3 mb-1">Consulta de Reporte de Estudiantes 2026</h1>
+      <p class="text-muted mb-0 small">Busqueda por cédula o pasaporte del estudiante</p>
     </div>
   </header>
 
@@ -20,7 +21,7 @@
     <section class="search-panel card shadow-sm border-0 mb-4">
       <div class="card-body">
         <form id="form-busqueda" novalidate>
-          <label for="input-id" class="form-label fw-semibold">Cédula / ID</label>
+          <label for="input-id" class="form-label fw-semibold">Cédula / Pasaporte</label>
           <div class="input-group input-group-lg">
             <input
               type="text"
@@ -32,12 +33,12 @@
               required
             >
             <button type="submit" class="btn btn-primary" id="btn-buscar">
-              <span class="btn-text">Buscar</span>
+              <span class="btn-text">Buscar Reporte</span>
               <span class="spinner-border spinner-border-sm d-none" id="spinner-buscar" role="status" aria-hidden="true"></span>
             </button>
           </div>
           <div class="invalid-feedback" id="feedback-id">Ingrese un ID válido.</div>
-          <button type="button" class="btn btn-outline-secondary mt-3 d-none w-100" id="btn-buscar-otro">
+          <button type="btn-text" class="btn btn-outline-secondary mt-3 d-none w-100" id="btn-buscar-otro">
             Buscar otro reporte
           </button>
         </form>
@@ -70,18 +71,20 @@
             </dl>
           </div>
           <div class="col-md-6">
-            <h3 class="h6 text-uppercase text-muted mb-3">Calificaciones y registro</h3>
+            <h3 class="h6 text-uppercase text-muted mb-3">Calificaciones y Registro de Asistencia</h3>
             <dl class="row mb-0 datos-estudiante">
-              <dt class="col-6">Ingles</dt>
+              <dt class="col-6">Inglés</dt>
               <dd class="col-6" id="valor-ingles">—</dd>
-              <dt class="col-6">Informatica</dt>
+              <dt class="col-6">Informática</dt>
               <dd class="col-6" id="valor-informatica">—</dd>
               <dt class="col-6">Valores</dt>
               <dd class="col-6" id="valor-valores">—</dd>
+              <br>
               <dt class="col-6">Ausencias</dt>
               <dd class="col-6" id="valor-ausencias">—</dd>
               <dt class="col-6">Tardanzas</dt>
               <dd class="col-6" id="valor-tardanzas">—</dd>
+              <br>
               <dt class="col-6">Cuota a pagar</dt>
               <dd class="col-6 fw-semibold text-primary" id="valor-cuota">—</dd>
             </dl>
@@ -92,7 +95,8 @@
   </main>
 
   <footer class="text-center text-muted small py-3 border-top">
-    <p class="mb-0">Consulta de estudiantes — datos en memoria desde Excel</p>
+    <p class="mb-0">Reporte de Estudiantes 2026</p>
+    <p class="mb-0">Centro ¡Supérate! Fundación Alberto Motta San Miguelito</p>
   </footer>
 
   <!-- GitHub Pages: descomente y ponga la URL de su API Node desplegada -->
