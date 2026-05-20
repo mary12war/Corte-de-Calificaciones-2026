@@ -17,6 +17,7 @@ const elementos = {
   inputId: document.getElementById('input-id'),
   feedbackId: document.getElementById('feedback-id'),
   btnBuscar: document.getElementById('btn-buscar'),
+  btnBuscarOtro: document.getElementById('btn-buscar-otro'),
   spinner: document.getElementById('spinner-buscar'),
   alertaError: document.getElementById('alerta-error'),
   noEncontrado: document.getElementById('resultado-no-encontrado'),
@@ -126,6 +127,22 @@ function limpiarResultados() {
   elementos.alertaError.textContent = '';
   elementos.noEncontrado.classList.add('d-none');
   elementos.tarjeta.classList.add('d-none');
+  actualizarBotonBuscarOtro();
+}
+
+function actualizarBotonBuscarOtro() {
+  const hayResultado =
+    !elementos.tarjeta.classList.contains('d-none') ||
+    !elementos.noEncontrado.classList.contains('d-none') ||
+    !elementos.alertaError.classList.contains('d-none');
+  elementos.btnBuscarOtro.classList.toggle('d-none', !hayResultado);
+}
+
+function reiniciarBusqueda() {
+  elementos.inputId.value = '';
+  elementos.inputId.classList.remove('is-invalid');
+  limpiarResultados();
+  elementos.inputId.focus();
 }
 
 function validarId() {
@@ -245,6 +262,7 @@ async function buscarEstudiante(id) {
     elementos.alertaError.classList.remove('d-none');
   } finally {
     setCargando(false);
+    actualizarBotonBuscarOtro();
   }
 }
 
@@ -260,6 +278,8 @@ elementos.inputId.addEventListener('input', () => {
     elementos.inputId.classList.remove('is-invalid');
   }
 });
+
+elementos.btnBuscarOtro.addEventListener('click', reiniciarBusqueda);
 
 // Precargar JSON en GitHub Pages para que la primera búsqueda sea más rápida
 if (!debeUsarApi()) {
